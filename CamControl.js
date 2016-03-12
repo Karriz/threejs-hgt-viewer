@@ -128,8 +128,8 @@ function CamControl(object) {
         _this.object.translateZ(delta);
 
         // Minimum and maximum zoom levels
-        if (object.position.z <= 2.9) {
-            _this.object.position.set(0,0,3);
+        if (object.position.z <= 0.5) {
+            _this.object.position.set(0,0,0.6);
         } else if (object.position.z >= 201.0) {
             _this.object.position.set(0,0,200);
         }

@@ -74,17 +74,45 @@ function HeightMapper() {
             w_i = 0;
             
             for (var i=0;i<size;i++) {
-                h_i = Math.floor(i/h_step);
+                h_i = i/h_step;
                 
                 for (var j=0;j<size;j++) {
-                    w_i = Math.floor(j/w_step);
+                    w_i = j/w_step;
                     
-                    actual_r = Math.floor(start_r + h_i);
-                    actual_c = Math.floor(start_c + w_i);
+                    actual_r = start_r + h_i;
+                    actual_c = start_c + w_i;
                     
-                    actual_index = (actual_r*1201+actual_c)*2;
+                    c_left = actual_c - Math.floor(actual_c);
+                    r_up = actual_r - Math.floor(actual_r);
                     
-                    var h=datav.getInt16(actual_index,false);
+                    actual_r = Math.floor(actual_r);
+                    actual_c = Math.floor(actual_c);
+                    
+                    actual_index_ul = Math.floor(actual_r*1201+actual_c);
+                    if (actual_c < 1200) {
+                        actual_index_ur = Math.floor(actual_r*1201+actual_c+1);
+                    }
+                    else {
+                        actual_index_ur = Math.floor(actual_r*1201+actual_c);
+                    }
+                    if (actual_r < 1200) {
+                        actual_index_dl = Math.floor((actual_r+1)*1201+actual_c);
+                    }
+                    else {
+                        actual_index_dl = Math.floor((actual_r)*1201+actual_c);
+                    }
+                    if (actual_r < 1200 && actual_c < 1200) {
+                        actual_index_dr = Math.floor((actual_r+1)*1201+actual_c+1);
+                    }
+                    else {
+                        actual_index_dr = Math.floor((actual_r)*1201+actual_c);
+                    }
+                    var h_ul = datav.getInt16(actual_index_ul*2,false);
+                    var h_ur = datav.getInt16(actual_index_ur*2,false);
+                    var h_dl = datav.getInt16(actual_index_dl*2,false);
+                    var h_dr = datav.getInt16(actual_index_dr*2,false);
+                    
+                    h = (1-c_left) * (1-r_up) * h_ul + (1-c_left) * r_up * h_dl + c_left * (1-r_up) * h_ur + c_left * r_up * h_dr;
                     
                     //console.log(h);
                     

@@ -33,11 +33,11 @@ function HeightMapper() {
         
         console.log(h_step,w_step);
         
-        top_row = 1201 - Math.abs(1201*(endlat - Math.floor(endlat)));
-        left_column = Math.abs(1201*(startlon - Math.floor(startlon)));
+        top_row = 1200 - Math.abs(1200*(endlat - Math.floor(endlat)));
+        left_column = Math.abs(1200*(startlon - Math.floor(startlon)));
         
-        bottom_row = 1201 - Math.abs(1201*(startlat - Math.floor(startlat)));
-        right_column = Math.abs(1201*(endlon - Math.floor(endlon)));
+        bottom_row = 1200 - Math.abs(1200*(startlat - Math.floor(startlat)));
+        right_column = Math.abs(1200*(endlon - Math.floor(endlon)));
         
         console.log(top_row, left_column);
         
@@ -110,12 +110,12 @@ function HeightMapper() {
                 oReq.passed_rows = passed_rows;
                 oReq.passed_columns = passed_columns;
                 
-                start_i = Math.floor(((passed_rows) / h_indices) * size);
-                end_i = Math.floor(((passed_rows+end_row-start_row) / h_indices) * size);
+                start_i = Math.round(((passed_rows) / h_indices) * size);
+                end_i = Math.round(((passed_rows+end_row-start_row) / h_indices) * size);
                 end_i = Math.min(end_i,500);
                 
-                start_j = Math.floor(((passed_columns) / w_indices) * size);
-                end_j = Math.floor(((passed_columns+end_column-start_column) / w_indices) * size);
+                start_j = Math.round(((passed_columns) / w_indices) * size);
+                end_j = Math.round(((passed_columns+end_column-start_column) / w_indices) * size);
                 end_j = Math.min(end_j,500);
                 
                 oReq.filename = '/Heightmaps/'+latstr+lonstr+'.hgt';
@@ -140,9 +140,9 @@ function HeightMapper() {
                     
                     console.log(this.filename);
                     console.log(this.start_row, this.start_column);
-                    console.log(this.start_i, this.end_i);
-                    console.log(this.start_j, this.end_j);
-                    console.log(this.passed_rows,this.passed_columns)
+                    console.log("Vertex rows:",this.start_i, this.end_i);
+                    console.log("Vertex columns:",this.start_j, this.end_j);
+                    console.log("Passed rows/columns:",this.passed_rows,this.passed_columns)
                     
                     for (var i=this.start_i;i<=this.end_i;i++) {
                         h_i = i/h_step;
@@ -150,14 +150,45 @@ function HeightMapper() {
                         for (var j=this.start_j;j<=this.end_j;j++) {
                             w_i = j/w_step;
                             
-                            actual_r = (top_row + h_i) % 1201;
-                            actual_c = (left_column + w_i) % 1201;
+                            var actual_r = 0;
+                            var actual_c = 0;
                             
-                            c_left = actual_c - Math.floor(actual_c);
-                            r_up = actual_r - Math.floor(actual_r);
+                            if (h_i >= this.passed_rows) {
+                                actual_r = (top_row + h_i) % 1201;
+                            }
+                            if (w_i >= this.passed_columns) {
+                                actual_c = (left_column + w_i) % 1201;
+                            }
                             
-                            actual_r = Math.ceil(actual_r);
-                            actual_c = Math.ceil(actual_c);
+                            actual_c = Math.min(1200,actual_c);
+                            actual_r = Math.min(1200,actual_r);
+                            
+                            c_left = actual_c - Math.round(actual_c);
+                            r_up = actual_r - Math.round(actual_r);
+                            
+                            actual_r = Math.round(actual_r);
+                            actual_c = Math.round(actual_c);
+                            
+                            if (i == this.start_i) {
+                                console.log("Start vertex row " + this.start_i+ " at file row "+actual_r);
+                            }
+                            if (j == this.start_j) {
+                                console.log("Start vertex column " + this.start_j+ " at file column "+actual_c);
+                            }
+                            
+                            if (i == this.end_i) {
+                                console.log("End vertex row " + this.end_i+ " at file row "+actual_r);
+                            }
+                            if (j == this.end_j) {
+                                console.log("End vertex column " + this.end_j+ " at file column "+actual_c);
+                            }
+                            
+                            if (actual_r == 0) {
+                                //console.log("First row at "+i);
+                            }                          
+                            if (actual_c == 0) {
+                                //console.log("First column at "+j);
+                            }
                             
                             //actual_r = Math.min(actual_r, 1200);
                             //actual_c = Math.min(actual_c, 1200);
@@ -188,9 +219,14 @@ function HeightMapper() {
                             
                             h = (1-c_left) * (1-r_up) * h_ul + (1-c_left) * r_up * h_dl + c_left * (1-r_up) * h_ur + c_left * r_up * h_dr;
                             
-                            //console.log(h);
+                            if (actual_r == 0) {
+                                //console.log("First row height: " + h);
+                            }                          
+                            if (actual_c == 0) {
+                                //console.log("First column height: " + h);
+                            }
                             
-                            geometry.vertices[i*size+j].setZ(h*scale);
+                            geometry.vertices[i*size+j].setZ(h*scale*1);
                         }
                     }
                     geometry.verticesNeedUpdate = true;

@@ -32,7 +32,7 @@ directionalLight.rotation.set( 0, 0, 0 );
 scene.add( directionalLight );
 
 mapLoader = new MapLoader();
-mapLoader.loadTile(28.318898, -14.087462, 10);
+mapLoader.loadTile(28.661402, -17.872627, 12);
 
 render();
 
